@@ -82,5 +82,6 @@ ReactDOM.render(<App/>,document.getElementById('root'));
 
 | 版本  | 更新内容                                                     |
 | ----- | ------------------------------------------------------------ |
-| 0.4.0 | Fix bug。                                                    |
+| 0.4.1 | 修复组件卸载后，鼠标样式未还原的 bug。                       |
+| 0.4.0 | 修复 style 被覆盖的 bug。                                    |
 | 0.3.0 | 1、新增 `onClick`、`onDragStart`、`onDrag`、`onDrangEnd` 回调。<br>2、优化性能。 |
