@@ -1,0 +1,40 @@
+{
+  "name": "react-mouse-handler",
+  "version": "0.1.0",
+  "description": "React 鼠标事件处理组件，通过这个高阶组件封装后，子组件具备光标样式设置（cursor）、鼠标事件回调（onMouseOver、onMouseMove、onMouseDown、onMouseUp、onMouseOut），在回调函数中可以拿到鼠标位置数据（localX、localY、globalX、globalY、dx、dy）",
+  "main": "lib/index.js",
+  "jsnext:main": "src/index.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack --config webpack.build.js",
+    "pub": "npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bluesliu/react-mouse-handler.git"
+  },
+  "keywords": [
+    "react",
+    "mouse",
+    "handler",
+    "cursor"
+  ],
+  "author": "blues",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1"
+  },
+  "peerDependencies": {},
+  "dependencies": {
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3"
+  }
+}
