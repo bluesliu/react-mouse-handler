@@ -24,6 +24,8 @@ const mouseHandler = (WrappedComponent)=> {
 
         cursor = undefined;
         canDrag = false;
+
+        // 给外部的回调
         onMouseOver = undefined;
         onMouseDown = undefined;
         onMouseOut = undefined;
@@ -34,9 +36,6 @@ const mouseHandler = (WrappedComponent)=> {
         onDrag = undefined;
         onDragEnd = undefined;
 
-        newProps = undefined;
-        newStyle = undefined;
-
         constructor(props) {
             super(props);
 
@@ -46,13 +45,19 @@ const mouseHandler = (WrappedComponent)=> {
             this.onUpHandler = this.onUpHandler.bind(this);
             this.onMoveHandler = this.onMoveHandler.bind(this);
             this.onClickHandler = this.onClickHandler.bind(this);
+        }
 
+        componentWillUnmount() {
+            document.body.style.cursor = '';
+        }
+
+        render() {
             const {
                 cursor, canDrag,
                 onMouseOver, onMouseDown, onMouseOut, onMouseUp, onMouseMove, onClick,
                 onDragStart, onDrag, onDragEnd,
-                style,          //高阶组件封装后，新组件接收的 style
-                ...newProps     //过滤后的属性
+                style:newStyle,          //高阶组件封装后，新组件接收的 style
+                ...newProps              //过滤后的属性
             } = this.props;
             this.cursor = cursor;
             this.canDrag = canDrag;
@@ -66,25 +71,18 @@ const mouseHandler = (WrappedComponent)=> {
             this.onDrag = onDrag;
             this.onDragEnd = onDragEnd;
 
+            // 给被包裹组件注册指针事件
             newProps.onPointerOver = this.onOverHandler;
             newProps.onPointerDown = this.onDownHandler;
             newProps.onPointerOut = this.onOutHandler;
             newProps.onPointerUp = this.onUpHandler;
             newProps.onPointerMove = this.onMoveHandler;
             newProps.onClick = this.onClickHandler;
-            this.newProps = newProps;
-            this.newStyle = style;
-        }
 
-        componentWillUnmount() {
-            document.body.style.cursor = '';
-        }
-
-        render() {
-            const {isOver} = this.state;
             const elementsTree = super.render();
-            const {style, ...elementsTreeProps} = elementsTree.props;
-            const mergeStyle = {...this.newStyle, ...style};
+            const {style:oldStyle, ...oldProps} = elementsTree.props;
+            const mergeStyle = {...newStyle, ...oldStyle};
+            const {isOver} = this.state;
             if (isOver) {
                 mergeStyle.cursor = this.cursor;
                 document.body.style.cursor = this.canDrag ? this.cursor : '';
@@ -92,9 +90,9 @@ const mouseHandler = (WrappedComponent)=> {
                 mergeStyle.cursor = '';
                 document.body.style.cursor = '';
             }
-            const mergeProps = Object.assign({}, elementsTreeProps, this.newProps);
+            const mergeProps = Object.assign({}, oldProps, newProps);
             mergeProps.style = mergeStyle;
-            return React.cloneElement(elementsTree, mergeProps, elementsTreeProps.children);
+            return React.cloneElement(elementsTree, mergeProps, oldProps.children);
         }
 
         onOverHandler(e) {

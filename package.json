@@ -1,6 +1,6 @@
 {
   "name": "react-mouse-handler",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "React 鼠标事件处理组件，通过这个高阶组件封装后，子组件具备光标样式设置（cursor）、鼠标事件回调（onMouseOver、onMouseMove、onMouseDown、onMouseUp、onMouseOut、onClick、onDragStar、onDrag、onDragEnd），在回调函数中可以拿到鼠标位置数据（localX、localY、globalX、globalY、dx、dy）",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
