@@ -76,6 +76,10 @@ const mouseHandler = (WrappedComponent)=> {
             this.newStyle = style;
         }
 
+        componentWillUnmount() {
+            document.body.style.cursor = '';
+        }
+
         render() {
             const {isOver} = this.state;
             const elementsTree = super.render();
