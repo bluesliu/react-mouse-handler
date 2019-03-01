@@ -26,12 +26,17 @@ class App extends Component {
                 <br/>
                 <div>
                     <MyComponent
-                        cursor="ew-resize" canDrag={true}
-                        onMouseOver={(e) => {
-                            console.log(e.target)
+                        cursor="ew-resize"
+                        canDrag={true}
+                        style={{color:"red"}}
+                        onDragStart={()=>{
+                            console.log('onDragStart');
                         }}
-                        onMouseMove={(e, position)=>{
-                            console.log(position)
+                        onDrag={(e, position) => {
+                            console.log('onDrag', e, position);
+                        }}
+                        onDragEnd={()=>{
+                            console.log('onDragEnd');
                         }}
                     >ew-resize</MyComponent>
                 </div>
@@ -40,8 +45,8 @@ class App extends Component {
                     src="https://www.baidu.com/img/xinshouye_4d9e7ecaa1b5f78475bf13965c6142d1.png"
                     cursor="help"
                     canDrag={false}
-                    onMouseMove={(e)=>{
-                        console.log(e);
+                    onClick={(e, position)=>{
+                        console.log('click',e,position)
                     }}
                 />
             </div>

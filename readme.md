@@ -1,6 +1,6 @@
 # react-mouse-handler
 
-React 鼠标事件处理组件，通过这个高阶组件封装后，子组件具备光标样式设置（`cursor`）、鼠标事件回调（`onMouseOver`、`onMouseMove`、`onMouseDown`、`onMouseUp`、`onMouseOut`），在回调函数中可以拿到鼠标位置数据（`localX`、`localY`、`globalX`、`globalY`、`dx`、`dy`）
+React 鼠标事件处理组件，通过这个高阶组件封装后，子组件具备光标样式设置（`cursor`）、鼠标事件回调（`onMouseOver`、`onMouseMove`、`onMouseDown`、`onMouseUp`、`onMouseOut`、`onClick`、`onDragStar`、`onDrag`、`onDragEnd`），在回调函数中可以拿到鼠标位置数据（`localX`、`localY`、`globalX`、`globalY`、`dx`、`dy`）
 
 
 
@@ -12,7 +12,7 @@ npm install react-mouse-handler --save-dev
 
 
 
-## use
+## demo
 
 自定义组件：
 
@@ -53,8 +53,8 @@ class App extends Component {
             console.log(position.localY);   // 相对于父容器的局部坐标y
             console.log(position.globalX);  // 相对于document的全局坐标x
             console.log(position.globalY);  // 相对于document的全局坐标y
-            console.log(position.dx);       // 水平方向的移动增量（只有在onMouseMove时有意义）
-            console.log(position.dy);       // 垂直方向的移动增量（只有在onMouseMove时有意义）
+            console.log(position.dx);       // 水平方向的移动增量（只有在onMouseMove、onDrag时有意义）
+            console.log(position.dy);       // 垂直方向的移动增量（只有在onMouseMove、onDrag时有意义）
           }}
           onMouseOver={(e, position) => {
             // do something
@@ -76,3 +76,11 @@ class App extends Component {
 ReactDOM.render(<App/>,document.getElementById('root'));
 ```
 
+
+
+## update
+
+| 版本  | 更新内容                                                     |
+| ----- | ------------------------------------------------------------ |
+| 0.4.0 | Fix bug。                                                    |
+| 0.3.0 | 1、新增 `onClick`、`onDragStart`、`onDrag`、`onDrangEnd` 回调。<br>2、优化性能。 |

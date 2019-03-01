@@ -1,15 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+/**
+ *
+ * @param {Class} WrappedComponent 被包裹的组件
+ * @returns {{new(*=): MouseHandler, onOverHandler, onDownHandler, onOutHandler, onUpHandler, onMoveHandler, onClickHandler, cursor: *, canDrag: *, onMouseOver: *, onMouseDown: *, onMouseOut: *, onMouseUp: *, onMouseMove: *, onClick: *, onDragStart: *, onDrag: *, onDragEnd: *, newProps: *, newStyle: *, isDown: boolean, dx, dy, globalX, globalY, localX, localY, prototype: MouseHandler}}
+ */
 const mouseHandler = (WrappedComponent)=> {
 
     return class MouseHandler extends WrappedComponent {
 
         state = {
-            event: "",
             isOver: false
         };
 
+        isDown = false;
         localX = 0;
         localY = 0;
         globalX = 0;
@@ -24,12 +29,31 @@ const mouseHandler = (WrappedComponent)=> {
         onMouseOut = undefined;
         onMouseUp = undefined;
         onMouseMove = undefined;
-        otherProps = undefined;
+        onClick = undefined;
+        onDragStart = undefined;
+        onDrag = undefined;
+        onDragEnd = undefined;
+
+        newProps = undefined;
+        newStyle = undefined;
 
         constructor(props) {
             super(props);
 
-            const {cursor, canDrag, onMouseOver, onMouseDown, onMouseOut, onMouseUp, onMouseMove, ...otherProps} = this.props;
+            this.onOverHandler = this.onOverHandler.bind(this);
+            this.onDownHandler = this.onDownHandler.bind(this);
+            this.onOutHandler = this.onOutHandler.bind(this);
+            this.onUpHandler = this.onUpHandler.bind(this);
+            this.onMoveHandler = this.onMoveHandler.bind(this);
+            this.onClickHandler = this.onClickHandler.bind(this);
+
+            const {
+                cursor, canDrag,
+                onMouseOver, onMouseDown, onMouseOut, onMouseUp, onMouseMove, onClick,
+                onDragStart, onDrag, onDragEnd,
+                style,          //高阶组件封装后，新组件接收的 style
+                ...newProps     //过滤后的属性
+            } = this.props;
             this.cursor = cursor;
             this.canDrag = canDrag;
             this.onMouseOver = onMouseOver;
@@ -37,53 +61,55 @@ const mouseHandler = (WrappedComponent)=> {
             this.onMouseOut = onMouseOut;
             this.onMouseUp = onMouseUp;
             this.onMouseMove = onMouseMove;
-            this.otherProps = otherProps;
+            this.onClick = onClick;
+            this.onDragStart = onDragStart;
+            this.onDrag = onDrag;
+            this.onDragEnd = onDragEnd;
 
-            this.onOverHandler = this.onOverHandler.bind(this);
-            this.onDownHandler = this.onDownHandler.bind(this);
-            this.onOutHandler = this.onOutHandler.bind(this);
-            this.onUpHandler = this.onUpHandler.bind(this);
-            this.onMoveHandler = this.onMoveHandler.bind(this);
-        }
-
-        render() {
-            const {isOver} = this.state;
-            const elementsTree = super.render();
-            let newProps = {};
             newProps.onPointerOver = this.onOverHandler;
             newProps.onPointerDown = this.onDownHandler;
             newProps.onPointerOut = this.onOutHandler;
             newProps.onPointerUp = this.onUpHandler;
             newProps.onPointerMove = this.onMoveHandler;
+            newProps.onClick = this.onClickHandler;
+            this.newProps = newProps;
+            this.newStyle = style;
+        }
+
+        render() {
+            const {isOver} = this.state;
+            const elementsTree = super.render();
+            const {style, ...elementsTreeProps} = elementsTree.props;
+            const mergeStyle = {...this.newStyle, ...style};
             if (isOver) {
-                newProps.style = {cursor: this.cursor};
+                mergeStyle.cursor = this.cursor;
                 document.body.style.cursor = this.canDrag ? this.cursor : '';
             } else {
-                newProps.style = {cursor: ''};
+                mergeStyle.cursor = '';
                 document.body.style.cursor = '';
             }
-            const props = Object.assign({}, elementsTree.props, newProps, this.otherProps);
-            return React.cloneElement(elementsTree, props, elementsTree.props.children);
+            const mergeProps = Object.assign({}, elementsTreeProps, this.newProps);
+            mergeProps.style = mergeStyle;
+            return React.cloneElement(elementsTree, mergeProps, elementsTreeProps.children);
         }
 
         onOverHandler(e) {
             this.onMouseOver && this.onMouseOver.call(this, e, this.getMousePosition(e));
             this.setState({
                 ...this.state,
-                isOver: true,
-                event: "over"
+                isOver: true
             });
         }
 
         onDownHandler(e) {
+            this.isDown = true;
             if (this.canDrag) {
                 e.target.setPointerCapture(e.pointerId);
             }
             this.onMouseDown && this.onMouseDown.call(this, e, this.getMousePosition(e));
-            this.setState({
-                ...this.state,
-                event: "down"
-            });
+            if(this.canDrag){
+                this.onDragStart && this.onDragStart.call(this, e, this.getMousePosition(e));
+            }
         }
 
         onOutHandler(e) {
@@ -91,44 +117,40 @@ const mouseHandler = (WrappedComponent)=> {
             this.setState({
                 ...this.state,
                 isOver: false,
-                event: "out"
             });
         }
 
         onUpHandler(e) {
+            this.isDown = false;
             if (this.canDrag) {
                 e.target.releasePointerCapture(e.pointerId);
             }
             this.onMouseUp && this.onMouseUp.call(this, e, this.getMousePosition(e));
-            this.setState({
-                ...this.state,
-                event: "up"
-            });
+            if(this.canDrag){
+                this.onDragEnd && this.onDragEnd.call(this, e, this.getMousePosition(e));
+            }
         }
 
         onMoveHandler(e) {
             this.onMouseMove && this.onMouseMove.call(this, e, this.getMousePosition(e));
-            if(this.state.event==='move'){
-                return;
+            if(this.canDrag && this.isDown){
+                this.onDrag && this.onDrag.call(this, e, this.getMousePosition(e));
             }
-            this.setState({
-                ...this.state,
-                event: "move"
-            });
+        }
+
+        onClickHandler(e) {
+            this.onClick && this.onClick.call(this, e, this.getMousePosition(e));
         }
 
         getMousePosition(e) {
             switch (e.type) {
-                case 'pointerover':
-                case 'pointerout':
-                case 'pointerdown':
-                case 'pointerup':
-                    this.dx = 0;
-                    this.dy = 0;
-                    break;
                 case 'pointermove':
                     this.dx = e.pageX - this.globalX;
                     this.dy = e.pageY - this.globalY;
+                    break;
+                default:
+                    this.dx = 0;
+                    this.dy = 0;
                     break;
             }
             this.globalX = e.pageX;
