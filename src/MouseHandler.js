@@ -1,14 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-/**
- *
- * @param {Class} WrappedComponent 被包裹的组件
- * @returns {{new(*=): MouseHandler, onOverHandler, onDownHandler, onOutHandler, onUpHandler, onMoveHandler, onClickHandler, cursor: *, canDrag: *, onMouseOver: *, onMouseDown: *, onMouseOut: *, onMouseUp: *, onMouseMove: *, onClick: *, onDragStart: *, onDrag: *, onDragEnd: *, newProps: *, newStyle: *, isDown: boolean, dx, dy, globalX, globalY, localX, localY, prototype: MouseHandler}}
- */
-const mouseHandler = (WrappedComponent)=> {
+const mouseHandler = (canDrag=false, cursor=undefined)=> (WrappedComponent)=> {
 
-    return class MouseHandler extends WrappedComponent {
+    return class extends WrappedComponent {
 
         state = {
             isOver: false
@@ -22,8 +17,8 @@ const mouseHandler = (WrappedComponent)=> {
         dx = 0;
         dy = 0;
 
-        cursor = undefined;
-        canDrag = false;
+        cursor = cursor;
+        canDrag = canDrag;
 
         // 给外部的回调
         onMouseOver = undefined;
@@ -59,8 +54,9 @@ const mouseHandler = (WrappedComponent)=> {
                 style:newStyle,          //高阶组件封装后，新组件接收的 style
                 ...newProps              //过滤后的属性
             } = this.props;
-            this.cursor = cursor;
-            this.canDrag = canDrag;
+
+            this.cursor = cursor!==undefined?cursor:this.cursor;
+            this.canDrag = canDrag!==undefined?canDrag:this.canDrag;
             this.onMouseOver = onMouseOver;
             this.onMouseDown = onMouseDown;
             this.onMouseOut = onMouseOut;
@@ -81,7 +77,7 @@ const mouseHandler = (WrappedComponent)=> {
 
             const elementsTree = super.render();
             const {style:oldStyle, ...oldProps} = elementsTree.props;
-            const mergeStyle = {...newStyle, ...oldStyle};
+            const mergeStyle = {...oldStyle,...newStyle};
             const {isOver} = this.state;
             if (isOver) {
                 mergeStyle.cursor = this.cursor;
@@ -92,7 +88,13 @@ const mouseHandler = (WrappedComponent)=> {
             }
             const mergeProps = Object.assign({}, oldProps, newProps);
             mergeProps.style = mergeStyle;
-            return React.cloneElement(elementsTree, mergeProps, oldProps.children);
+
+            // 后传入的 children 会覆盖只是的 children
+            let children = oldProps.children;
+            if(this.props.children){
+                children = this.props.children;
+            }
+            return React.cloneElement(elementsTree, mergeProps, children);
         }
 
         onOverHandler(e) {
@@ -108,14 +110,16 @@ const mouseHandler = (WrappedComponent)=> {
             if (this.canDrag) {
                 e.target.setPointerCapture(e.pointerId);
             }
-            this.onMouseDown && this.onMouseDown.call(this, e, this.getMousePosition(e));
+            const position = this.getMousePosition(e);
+            this.onMouseDown && this.onMouseDown.call(this, e, position);
             if(this.canDrag){
-                this.onDragStart && this.onDragStart.call(this, e, this.getMousePosition(e));
+                this.onDragStart && this.onDragStart.call(this, e, position);
             }
         }
 
         onOutHandler(e) {
-            this.onMouseOut && this.onMouseOut.call(this, e, this.getMousePosition(e));
+            const position = this.getMousePosition(e);
+            this.onMouseOut && this.onMouseOut.call(this, e, position);
             this.setState({
                 ...this.state,
                 isOver: false,
@@ -127,21 +131,24 @@ const mouseHandler = (WrappedComponent)=> {
             if (this.canDrag) {
                 e.target.releasePointerCapture(e.pointerId);
             }
-            this.onMouseUp && this.onMouseUp.call(this, e, this.getMousePosition(e));
+            const position = this.getMousePosition(e);
+            this.onMouseUp && this.onMouseUp.call(this, e, position);
             if(this.canDrag){
-                this.onDragEnd && this.onDragEnd.call(this, e, this.getMousePosition(e));
+                this.onDragEnd && this.onDragEnd.call(this, e, position);
             }
         }
 
         onMoveHandler(e) {
-            this.onMouseMove && this.onMouseMove.call(this, e, this.getMousePosition(e));
+            const position = this.getMousePosition(e);
+            this.onMouseMove && this.onMouseMove.call(this, e, position);
             if(this.canDrag && this.isDown){
-                this.onDrag && this.onDrag.call(this, e, this.getMousePosition(e));
+                this.onDrag && this.onDrag.call(this, e, position);
             }
         }
 
         onClickHandler(e) {
-            this.onClick && this.onClick.call(this, e, this.getMousePosition(e));
+            const position = this.getMousePosition(e);
+            this.onClick && this.onClick.call(this, e, position);
         }
 
         getMousePosition(e) {

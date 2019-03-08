@@ -1,3 +1,7 @@
-import MouseHandler from "./MouseHandler";
+import mouseHandler from "./MouseHandler";
+import MouseContainer from "./MouseContainer";
 
-export default MouseHandler;
+export {
+    MouseContainer,
+    mouseHandler
+}

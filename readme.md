@@ -82,6 +82,8 @@ ReactDOM.render(<App/>,document.getElementById('root'));
 
 | 版本  | 更新内容                                                     |
 | ----- | ------------------------------------------------------------ |
+| 0.4.4 | 渲染规则：如果高阶组件传入`children`，就将原始组件的`children`覆盖。  |
+| 0.4.3 | 1、接口变更为：`mouseHandler(canDrag:boolean, cursor:string)(MyComponent)` <br>2、提供`MouseContainer`组件。<br>3、修复 bug。  |
 | 0.4.2 | 修复重绘组件的 bug。                                       |
 | 0.4.1 | 修复组件卸载后，鼠标样式未还原的 bug。                       |
 | 0.4.0 | 修复 style 被覆盖的 bug。                                    |

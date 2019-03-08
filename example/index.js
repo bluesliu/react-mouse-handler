@@ -1,21 +1,21 @@
 import ReactDOM from "react-dom";
 import React,{Component} from "react";
-import mouseHandler from "../src/MouseHandler";
+import {mouseHandler, MouseContainer} from "../src";
 
 
 class MyComponent extends Component{
     render() {
-        return <p>{this.props.children}</p>;
+        return <p>old children</p>;
     }
 }
-MyComponent = mouseHandler(MyComponent);
+MyComponent = mouseHandler(true)(MyComponent);
 
 class MyImg extends Component{
     render() {
         return <img>{this.props.children}</img>;
     }
 }
-MyImg = mouseHandler(MyImg);
+MyImg = mouseHandler()(MyImg);
 
 
 class App extends Component {
@@ -38,7 +38,7 @@ class App extends Component {
                         onDragEnd={()=>{
                             console.log('onDragEnd');
                         }}
-                    >ew-resize</MyComponent>
+                    >My Component</MyComponent>
                 </div>
                 <br/>
                 <MyImg
@@ -49,6 +49,7 @@ class App extends Component {
                         console.log('click',e,position)
                     }}
                 />
+                <MouseContainer onDrag={()=>{console.log("drag")}} style={{color:"#0000ff"}}>MouseContainer</MouseContainer>
             </div>
         )
     }
