@@ -1,55 +1,16 @@
 import ReactDOM from "react-dom";
 import React,{Component} from "react";
-import mouseHandler from "../src/MouseHandler";
-
-
-class MyComponent extends Component{
-    render() {
-        return <p>{this.props.children}</p>;
-    }
-}
-MyComponent = mouseHandler(MyComponent);
-
-class MyImg extends Component{
-    render() {
-        return <img>{this.props.children}</img>;
-    }
-}
-MyImg = mouseHandler(MyImg);
+import "./index.css"
+import {View} from "../src";
 
 
 class App extends Component {
     render() {
         return (
-            <div>
-                <p>App</p>
-                <br/>
-                <div>
-                    <MyComponent
-                        cursor="ew-resize"
-                        canDrag={true}
-                        style={{color:"red"}}
-                        onDragStart={()=>{
-                            console.log('onDragStart');
-                        }}
-                        onDrag={(e, position) => {
-                            console.log('onDrag', e, position);
-                        }}
-                        onDragEnd={()=>{
-                            console.log('onDragEnd');
-                        }}
-                    >ew-resize</MyComponent>
-                </div>
-                <br/>
-                <MyImg
-                    src="https://www.baidu.com/img/xinshouye_4d9e7ecaa1b5f78475bf13965c6142d1.png"
-                    cursor="help"
-                    canDrag={false}
-                    onClick={(e, position)=>{
-                        console.log('click',e,position)
-                    }}
-                />
-            </div>
+            <View width="800" height="600" backgroundColor="#ffffff">
+                <View width="100%" height="100%" x={30} y={200} backgroundColor="#ff0000">view 2</View>
+                <View x={100} y={0} backgroundColor="#00ff00">view 3</View>
+            </View>
         )
     }
 }

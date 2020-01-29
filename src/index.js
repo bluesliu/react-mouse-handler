@@ -1,3 +1,4 @@
-import MouseHandler from "./MouseHandler";
-
-export default MouseHandler;
+import View from "./components/View";
+export {
+    View
+}
